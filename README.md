@@ -1,6 +1,7 @@
 # MAgPIE - Modular open source framework for modeling global land-systems
 
-  <https://www.pik-potsdam.de/research/projects/activities/land-use-modelling/magpie>
+[![DOI](https://zenodo.org/badge/135430060.svg)](https://zenodo.org/badge/latestdoi/135430060)
+[![R build status](https://github.com/magpiemodel/magpie/workflows/check/badge.svg)](https://github.com/magpiemodel/magpie/actions)
 
 ## WHAT IS MAGPIE?
 The *Model of Agricultural Production and its Impact on the Environment* (MAgPIE)
@@ -17,12 +18,14 @@ exogenously given population in 10 food energy categories, based on regional die
 Future trends in food demand are derived from a cross-country regression analysis,
 based on future scenarios on GDP and population growth.
 
+https://www.pik-potsdam.de/research/projects/activities/land-use-modelling/magpie
+
 ## DOCUMENTATION
 A framework description paper has been published in
 Geoscientific Model Development (GMD): https://doi.org/10.5194/gmd-12-1299-2019
 
-The model documentation for version 4.1 can be found at
-https://rse.pik-potsdam.de/doc/magpie/4.1/
+The model documentation for version 4.8.2 can be found at
+https://rse.pik-potsdam.de/doc/magpie/4.8.2/
 
 A most recent version of the documentation can also be extracted from the
 model source code via the R package goxygen
@@ -30,14 +33,17 @@ model source code via the R package goxygen
 package and run the main function (goxygen) in the main folder of the model.
 The resulting documentation can be found in the folder "doc".
 
-Please pay attentions to the MAgPIE Coding Etiquette when you modify the code.
-The Coding Etiquette you find at
-https://redmine.pik-potsdam.de/projects/pik-model-operations/wiki/Coding_Etiquette
-The Coding Etiquette explains also the used name conventions and other
+Please find a set of tutorials here https://magpiemodel.github.io/tutorials/.
+This guide will give you a brief technical introduction in how to install, run and use the model
+and how to analyse the model output.
+
+Please pay attention to the MAgPIE Coding Etiquette when you modify the code.
+The Coding Etiquette you find at the beginning of the documentation mentioned above.
+The Coding Etiquette explains also the naming conventions and other
 structural characteristics.
 
 ## COPYRIGHT
-Copyright 2008-2019 Potsdam Institute for Climate Impact Research (PIK)
+Copyright 2008-2022 Potsdam Institute for Climate Impact Research (PIK)
 
 ## LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -59,79 +65,86 @@ When using a modified version of **MAgPIE** which is not identical to versions
 in the official main repository at https://github.com/magpiemodel add a suffix
 to the name to allow distinguishing versions (format **MAgPIE-suffix**).
 
-## SYSTEM REQUIREMENTS
+## HARDWARE REQUIREMENTS
 The model is quite resource heavy and works best on machines with high CPU clock
-and memory. Recommended is a machine with Windows, MacOS or Linux, with at least
-16GB of memory and a Core i7 CPU or similar.
+and memory. Recommended is a machine with at least 16GB of memory and a Core i7 CPU or similar.
 
 ## HOW TO INSTALL
-MAgPIE requires *GAMS* (https://www.gams.com/) including licenses for the
-solvers *CONOPT* and (optionally) *CPLEX* for its core calculations. As the model
-benefits significantly of recent improvements in *GAMS* and *CONOPT4* it is
-recommended to work with the most recent versions of both.
-Please make sure that the GAMS installation path is added to the PATH variable
-of the system.
+Commands formatted as `code` should generally be run in a terminal (PowerShell on Windows).
 
-In addition *R* (https://www.r-project.org/) is required for pre- and
-postprocessing and run management (needs to be added to the PATH variable
-as well).
+### List of Requirements
+- license for gams incl. CONOPT solver
+- gams >= 43.4.1
+- git >= 2.16.1
+- R >= 4.1.2 (+ matching Rtools on Windows)
+- pandoc >= 2.14.2
+- TeX >= 3.14159265
 
-For R some packages are required to run MAgPIE. All except of one (`gdxrrw`) are
-either distributed via the offical R CRAN or via a separate repository hosted at
-PIK (PIK-CRAN). Before proceeding PIK-CRAN should be added to the list of
-available repositories via:
+### OS specific setup
+Choose your operating system and follow the instructions there. You can also
+install requirements differently (e.g. using only installers on Windows), in
+the end it is only important that all requirements are installed in a suitable
+version and added to the PATH environment variable, so MAgPIE can use them.
+
+#### Ubuntu
+1. make sure you have a gams license incl. the CONOPT solver
+1. [install gams](https://www.gams.com/46/docs/UG_UNIX_INSTALL.html)
+1. install git, R, and pandoc with `sudo apt install git r-base pandoc`
+1. install TinyTeX with `Rscript -e 'install.packages("tinytex"); tinytex::install_tinytex()'`
+
+#### macOS
+1. make sure you have a gams license incl. the CONOPT solver
+1. [install gams](https://www.gams.com/46/docs/UG_MAC_INSTALL.html)
+1. install git, R, and pandoc with `brew install git r pandoc`
+1. install TinyTeX with `Rscript -e 'install.packages("tinytex"); tinytex::install_tinytex()'`
+
+#### Windows
+1. make sure you have a gams license incl. the CONOPT solver
+1. [install gams](https://www.gams.com/46/docs/UG_WIN_INSTALL.html)
+1. [download .msi pandoc file](https://github.com/jgm/pandoc/releases/latest) and run installer (`choco install pandoc` did not work in testing)
+1. [install chocolatey](https://chocolatey.org/install)
+1. install git, rig (R installer), and tinytex with `choco install -y git rig tinytex`
+1. restart terminal
+1. install R and Rtools with `rig add release; rig add rtools`
+
+### check setup is complete
+- restart terminal
+- `gams` should print many lines including "The installed license is valid."
+- `git --version`
+- `Rscript --version`
+- `pandoc --version`
+- `tex --version`
+
+If any of these are not found: Find the path to that executable
+(gams/git/Rscript/pandoc/tex, on Windows ending in '.exe') and add it to your
+PATH environment variable. Search for a tutorial online if you are unsure how to do that.
+
+### download and run MAgPIE
+1. download MAgPIE with `git clone https://github.com/magpiemodel/magpie.git`
+1. go into the MAgPIE folder `cd magpie`
+1. start a MAgPIE run with `Rscript start.R`, first time: installs all required R packages (takes a while)
+1. choose "1" for a default run
+1. then select "1" for direct execution
+
+### troubleshooting
+Please check [this discussion](https://github.com/magpiemodel/magpie/discussions/650) for known problems and solutions and to report new problems you encounter while setting up MAgPIE.
+
+## DOCKER
+To use Docker, copy your `gamslice.txt`
+into the MAgPIE main directory, and build the magpie image using the command
 ```
-options(repos = c(CRAN = "@CRAN@", pik = "https://rse.pik-potsdam.de/r/packages"))
+sudo docker build -t magpie .
 ```
-
-The `gdxrrw` package has to be downloaded directly from GAMS via
+Basic usage: Run the container (note the use of an absolute path) using
 ```
-download.file("https://support.gams.com/_media/gdxrrw:gdxrrw_1.0.2.zip",
-              "gdxrrw_1.0.2.zip")
-install.packages(“reshape2”)
-install.packages("gdxrrw_1.0.2.zip",repos = NULL)
+sudo docker run -v /an/absolute/path/to/a/folder/:/home/magpie/output -it magpie
 ```
-In some cases it can happen that `gdxrrw` does not return an error message during
-installation but also did not install properly. To verify a successful
-installation try to load the package via `library(gdxrrw)`.
+Note: this will run MAgPIE with the default settings, if you want to change them choose the
 
---------------------------------------------------------------------------------
-
-If loading of the package fails you need to install the package from source.
-Under Windows this requires to install Rtools
-(https://cran.r-project.org/bin/windows/Rtools/) and to add it to the PATH
-variable. After that you can run the following lines of code:
-
+Advanced usage: Run the container interactively using
 ```
-download.file("https://support.gams.com/_media/gdxrrw:gdxrrw_1.0.2.tar.gz",
-              "gdxrrw_1.0.2.tar.gz")
-install.packages("gdxrrw_1.0.2.tar.gz",repos = NULL, type="source")
+sudo docker run -v /an/absolute/path/to/a/folder/:/home/magpie/output -it magpie bash
 ```
-
---------------------------------------------------------------------------------
-
-
-After that all remaining packages can be installed via `install.packages`
-
-```
-pkgs <- c("ggplot2",
-          "curl",
-          "gdx",
-          "magclass",
-          "madrat",
-          "mip",
-          "lucode",
-          "magpie4",
-          "magpiesets",
-          "lusweave",
-          "luscale",
-          "goxygen",
-          "luplot")
-install.packages(pkgs)
-```
-For post-processing model outputs *Latex* is required
-(https://www.latex-project.org/get/). To be seen by the model it also needs to
-added to the PATH variable of your system.
 
 ## HOW TO CONFIGURE
 Model run settings are set in `config/default.cfg` (or another config file of
@@ -175,7 +188,7 @@ following requirements:
 
 For other dependencies comparable measures should apply. When a dependency is
 added this dependency should be added to the *HOW TO INSTALL* section in the
-README file of the model framework (mentioning the depencendy and explaining
+README file of the model framework (mentioning the dependency and explaining
 how it can be installed). If not all requirements can be fulfilled by the new
 dependency this case should be discussed with the model maintainer
 (magpie@pik-potsdam.de) to find a good solution for it.
@@ -200,6 +213,10 @@ In case that these recommendations can not be followed we would be happy if you
 could discuss that issue with the MAgPIE development team
 (magpie@pik-potsdam.de).
 
+## MODEL OUTPUT
+
+By default the results of a model run are written to an individual results folder within the "output/" folder of the model. The two most important output files are the fulldata.gdx and the report.mif. The fulldata.gdx is the technical output of the GAMS optimization and contains all quantities that were used during the optimization in unchanged form. The mif-file is a csv file of a specific format and is synthetized from the fulldata.gdx by post-processing scripts. It can be read in any text editor or spreadsheet program and is well suited for a quick look at the results and for further analysis.
+
 ## CONTACT
 magpie@pik-potsdam.de
 
@@ -209,10 +226,7 @@ magpie@pik-potsdam.de
 Please contact magpie@pik-potsdam.de
 
 ## CITATION
-See file CITATION.cff or the documentation of the model for information how
-to cite the model.
-
-[![DOI](https://zenodo.org/badge/135430060.svg)](https://zenodo.org/badge/latestdoi/135430060)
+See file CITATION.cff or the [How-to-Cite section](https://rse.pik-potsdam.de/doc/magpie/4.8.2/#how-to-cite) in the model documentation for information how to cite the model.
 
 ## AUTHORS
 See list of authors in CITATION.cff

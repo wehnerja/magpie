@@ -1,5 +1,6 @@
 cff-version: 1.0.3
 message: If you use this model, please cite it as below.
+type: software
 authors:
   - family-names: Dietrich
     given-names: Jan Philipp
@@ -9,6 +10,7 @@ authors:
 
   - family-names: Bodirsky
     given-names: Benjamin Leon
+    orcid: https://orcid.org/0000-0002-8242-6712
     affiliation: "Potsdam Institute for Climate Impact Research"
     email: bodirsky@pik-potsdam.de
 
@@ -19,6 +21,7 @@ authors:
 
   - family-names: Humpenöder
     given-names: Florian
+    orcid: https://orcid.org/0000-0003-2927-9407
     affiliation: "Potsdam Institute for Climate Impact Research"
     email: humpenoeder@pik-potsdam.de
 
@@ -43,13 +46,52 @@ authors:
 
   - family-names: Mishra
     given-names: Abhijeet
+    orcid: https://orcid.org/0000-0002-8287-9922
     affiliation: "Potsdam Institute for Climate Impact Research"
     email: mishra@pik-potsdam.de
 
+  - family-names: Beier
+    given-names: Felicitas Dorothea
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: beier@pik-potsdam.de
+
+  - family-names: Molina Bacca
+    given-names: Edna Johanna
+    orcid: https://orcid.org/0000-0001-6530-1849
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: mbacca@pik-potsdam.de
+
+  - family-names: von Jeetze
+    given-names: Patrick
+    orcid: https://orcid.org/0000-0002-1197-4412
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: vjeetze@pik-potsdam.de
+
+  - family-names: Windisch
+    given-names: Michael
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: windisch@pik-potsdam.de
+
+  - family-names: Crawford
+    given-names: Michael Scott
+    orcid: https://orcid.org/0000-0003-1282-400X
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: crawford@pik-potsdam.de
+
+  - family-names: Leip
+    given-names: Debbora
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: leip@pik-potsdam.de
+    
   - family-names: Klein
     given-names: David
     affiliation: "Potsdam Institute for Climate Impact Research"
     email: dklein@pik-potsdam.de
+
+  - family-names: Singh
+    given-names: Vartika
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: vasingh@pik-potsdam.de
 
   - family-names: Ambrósio
     given-names: Geanderson
@@ -65,25 +107,64 @@ authors:
     given-names: Anne
     affiliation: "Potsdam Institute for Climate Impact Research"
 
+  - family-names: Sauer
+    given-names: Pascal
+    orcid: https://orcid.org/0000-0002-6856-8239
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: pascal.sauer@pik-potsdam.de
+
+  - family-names: Köberle
+    given-names: Alexandre
+    orcid: https://orcid.org/0000-0003-0328-4750
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: alexkob@pik-potsdam.de
+
+  - family-names: Steinhauser
+    given-names: Jan
+    orcid: https://orcid.org/0000-0002-5989-6855
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: janstein@pik-potsdam.de
+
+  - family-names: Hötten
+    given-names: David
+    affiliation: "Potsdam Institute for Climate Impact Research"
+    email: davidho@pik-potsdam.de
+
   - family-names: Lotze-Campen
     given-names: Hermann
+    orcid: https://orcid.org/0000-0002-0003-5508
     affiliation: "Potsdam Institute for Climate Impact Research"
     email: lotze-campen@pik-potsdam.de
 
   - family-names: Popp
     given-names: Alexander
+    orcid: https://orcid.org/0000-0001-9500-1986
     affiliation: "Potsdam Institute for Climate Impact Research"
     email: popp@pik-potsdam.de
 
 title: MAgPIE - An Open Source land-use modeling framework
-version: 4.2dev
-date-released: 2019-05-02
+abstract: The *Model of Agricultural Production and its Impact on the Environment* (MAgPIE)
+  is a modular open source framework for modeling global land-systems, which is
+  coupled to the grid-based dynamic vegetation model LPJmL, with a spatial resolution
+  of 0.5degx0.5deg. It takes regional economic conditions such as demand for agricultural
+  commodities, technological development and production costs as well as spatially
+  explicit data on potential crop yields, land and water constraints (from LPJmL) into
+  account. Based on these, the model derives specific land use patterns, yields and
+  total costs of agricultural production for each grid cell. The objective function of
+  the land use model is to minimize total cost of production for a given amount of
+  regional food and bioenergy demand. Regional food energy demand is defined for an
+  exogenously given population in 10 food energy categories, based on regional diets.
+  Future trends in food demand are derived from a cross-country regression analysis,
+  based on future scenarios on GDP and population growth.
+version: 4.8.2dev
+date-released: 2024-09-24
 repository-code: https://github.com/magpiemodel/magpie
 keywords:
   - landuse
   - modeling
+  - model
   - nlp
   - partial equilibrium
 doi: 10.5281/zenodo.1418752
 license: AGPL-3.0-or-later
-url: https://www.pik-potsdam.de/research/projects/activities/land-use-modelling/magpie
+url: https://github.com/magpiemodel/magpie

@@ -1,0 +1,34 @@
+#!/usr/bin/env Rscript
+
+gmsRequiredVersion <- "0.24.1"
+if (tryCatch(utils::packageVersion("gms") < gmsRequiredVersion, error = function(error) TRUE)) {
+  message("gms >= ", gmsRequiredVersion, " is required, installing now...")
+  install.packages("gms")
+}
+
+message("Checking files for tabs... ", appendLF = FALSE)
+gms::checkNoTabs(pattern = "\\.(R|Rprofile|gms|cfg|bib)$",
+                 excludeFolders = c("output", "renv", ".git"))
+message("done.")
+
+stagedFiles <- system("git diff --cached --name-only", intern = TRUE)
+
+# run codeCheck only if .gms file is staged
+if (any(endsWith(stagedFiles, ".gms"))) {
+  invisible(gms::codeCheck(strict = TRUE))
+  message("")
+}
+
+
+# make sure that files are not too big
+maxFilesize <- 250 # kB
+
+files <- union(system("git ls-tree -r HEAD --name-only", intern = TRUE), stagedFiles)
+out <- data.frame(files = files, size = round(file.size(files) / 1024, 2))
+out <- out[!is.na(out$size), ]
+out <- out[out$size > maxFilesize, ]
+if (nrow(out) > 0) {
+  stop(nrow(out), " files with size > ", maxFilesize, "kB detected: \n",
+       paste0(out$files, " (", out$size, "kB)", collapse = "\n"))
+}
+message("All files are smaller than ", maxFilesize, "kB\n")

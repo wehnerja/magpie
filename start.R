@@ -1,4 +1,4 @@
-# |  (C) 2008-2019 Potsdam Institute for Climate Impact Research (PIK)
+# |  (C) 2008-2024 Potsdam Institute for Climate Impact Research (PIK)
 # |  authors, and contributors see CITATION.cff file. This file is part
 # |  of MAgPIE and licensed under AGPL-3.0-or-later. Under Section 7 of
 # |  AGPL-3.0, you are granted additional permissions described in the
@@ -9,125 +9,90 @@
 #### MAgPIE output generation ####
 ##########################################################
 
-library(lucode)
+if (!is.null(renv::project())) {
+  ask <- function(question) {
+    message(question, appendLF = FALSE)
+    return(tolower(gms::getLine()) %in% c("", "y", "yes"))
+  }
+
+  message("Checking for updates... ", appendLF = FALSE)
+  if (getOption("autoRenvUpdates", FALSE) ||
+        (!is.null(piamenv::showUpdates()) && ask("Update now? (Y/n): "))) {
+    updates <- piamenv::updateRenv()
+    piamenv::stopIfLoaded(names(updates))
+  }
+  message("Update check done.")
+
+  message("Checking package version requirements... ", appendLF = FALSE)
+  updates <- piamenv::fixDeps(ask = TRUE)
+  piamenv::stopIfLoaded(names(updates))
+  message("Requirements check done.")
+}
+
+library(lucode2)
+library(gms)
+source("scripts/helper.R")
 
 runOutputs <- function(runscripts=NULL, submit=NULL) {
 
-  get_line <- function(){
-    # gets characters (line) from the terminal or from a connection
-    # and returns it
-    if(interactive()){
-      s <- readline()
-    } else {
-      con <- file("stdin")
-      s <- readLines(con, 1, warn=FALSE)
-      on.exit(close(con))
-    }
-    return(s);
-  }
-
-
-  choose_module <- function(Rfolder,title="Please choose an outputmodule") {
-    forder <- paste0(Rfolder,"/order.cfg")
-    if(file.exists(forder)) {
-      order <- grep("(#|^$)",readLines(forder),invert=TRUE,value=TRUE)
-      if(length(order)==0) order <- NULL
-    } else {
-      order <- NULL
-    }
-    module <- gsub("\\.R$","",grep("\\.R$",list.files(Rfolder), value=TRUE))
-    #sort modules based on order.cfg
-    module <- intersect(union(order,module),module)
-    cat("\n",title,":\n", sep="")
-    cat(paste(1: length(module), gsub("_"," ",module,fixed=TRUE), sep=": " ),sep="\n")
-    cat("Number: ")
-    identifier <- get_line()
-    identifier <- as.numeric(strsplit(identifier,",")[[1]])
-    if (any(!(identifier %in% 1:length(module)))) stop("This choice (",identifier,") is not possible. Please type in a number between 1 and ",length(module))
-    return(module[identifier])
-  }
-
-  choose_submit <- function(title="Please choose run submission type") {
-    slurm <- suppressWarnings(ifelse(system2("srun",stdout=FALSE,stderr=FALSE) != 127, TRUE, FALSE))
-    modes <- c("SLURM priority",
-               "SLURM standby",
-               "Direct execution",
-               "Background execution",
-               "Debug mode")
-    if(slurm) {
-      cat("\nCurrent cluster utilization:\n")
-      system("sclass")
-      cat("\n")
-    } else {
-      modes <- grep("SLURM",modes,invert=TRUE,value=TRUE)
-    }
-    cat("\n",title,":\n", sep="")
-    cat(paste(1:length(modes), modes, sep=": " ),sep="\n")
-    cat("Number: ")
-    identifier <- get_line()
-    identifier <- as.numeric(strsplit(identifier,",")[[1]])
-    if(slurm) {
-      comp <- switch(identifier,
-                     "1" = "slurmpriority",
-                     "2" = "slurmstandby",
-                     "3" = "direct",
-                     "4" = "background",
-                     "5" = "debug")
-    } else {
-      comp <- switch(identifier,
-                     "1" = "direct",
-                     "2" = "background",
-                     "3" = "debug")
-    }
-    if(is.null(comp)) stop("This type is invalid. Please choose a valid type")
-    return(comp)
-  }
-
-  runsubmit <- function(runscripts, submit) {
+  runSubmit <- function(runscripts, submit,
+                        slurmModes="scripts/slurmStart.yml") {
+    if(!dir.exists("logs")) dir.create("logs")
+    
     for(rout in runscripts){
-      name   <- paste0("./scripts/start/",rout,".R")
-
-      if(!file.exists(name)) {
-        warning("Script ",name, " could not be found. Skip execution!")
-        next
+      script   <- paste0("./scripts/start/",rout)
+      if(!file.exists(script)) {
+        script <- paste0(script,".R")
+        if(!file.exists(script)) {
+          warning("Script ",script, " could not be found. Skip execution!")
+          next
+        }
       }
 
-      cat("Executing",name,"\n")
-      srun_command <- paste0("srun --job-name=",rout," --output=",rout,"-%j.out --mail-type=END")
-      if(submit=="direct") {
+      cat("Executing",script,"\n")
+      name <- sub("\\.R$","",sub("/","_",rout))
+      if(submit %in% c("Direct execution", "direct")) {
         tmp.env <- new.env()
-        tmp.error <- try(sys.source(name,envir=tmp.env))
-        if(!is.null(tmp.error)) warning("Script ",name," was stopped by an error and not executed properly!")
+        tmp.error <- try(sys.source(script, envir=tmp.env))
+        if(!is.null(tmp.error)) warning("Script ",script," was stopped by an error and not executed properly!")
         rm(tmp.env)
-      } else if(submit=="background") {
-        log <- format(Sys.time(), paste0(rout,"-%Y-%H-%M-%S-%OS3.log"))
-        system2("Rscript",name, stderr = log, stdout = log, wait=FALSE)
-      } else if(submit=="slurmpriority") {
-        system(paste0(srun_command," --qos=priority Rscript ",name), wait=FALSE)
-        Sys.sleep(1)
-      } else if(submit=="slurmstandby") {
-        system(paste0(srun_command," --qos=standby Rscript ",name), wait=FALSE)
-        Sys.sleep(1)
-      } else if(submit=="debug") {
+      } else if(submit %in% c("Background execution", "background")) {
+        log <- format(Sys.time(), paste0("logs/", name, "-%Y-%H-%M-%S-%OS3.log"))
+        system2("Rscript",script, stderr = log, stdout = log, wait=FALSE)
+      } else if(submit %in% c("Debug mode", "debug")) {
         tmp.env <- new.env()
-        sys.source(name,envir=tmp.env)
+        sys.source(script,envir=tmp.env)
         rm(tmp.env)
       } else {
-        stop("Unknown submission type")
+        slurm <- yaml::read_yaml(slurmModes)$slurmjobs
+        if(submit %in% names(slurm)) {
+          command <- slurm[submit]
+          command <- gsub("%NAME", name, command)
+          command <- gsub("%SCRIPT", script, command)
+          message(command)
+          system(command)
+          Sys.sleep(1)
+        } else {
+          stop("Unknown submission type")
+        }
       }
     }
   }
 
-
-
-  if(is.null(runscripts)) runscripts <- choose_module("./scripts/start",
-                                                      "Choose start script")
-  if(is.null(submit))     submit     <- choose_submit("Choose submission type")
-
-  runsubmit(runscripts, submit)
+  if(is.null(runscripts)) runscripts <- gms::selectScript("./scripts/start")
+  if(is.null(runscripts)) {
+    message("No start script selected! Stop here.")
+    return(invisible(NULL))
+  }
+  if(is.null(submit)) submit <- chooseSubmit("Choose submission type",
+                                             slurmModes = "scripts/slurmStart.yml")
+  runSubmit(runscripts, submit)
 }
 
 
-runscripts <- submit <- NULL
-readArgs("runscripts","submit", .silent=TRUE)
-runOutputs(runscripts=runscripts, submit=submit)
+system("git config core.hooksPath .githooks")
+
+submit <- NULL
+runscripts <- NULL
+lucode2::readArgs("runscripts", "submit", .silent = TRUE)
+runOutputs(runscripts = runscripts, submit = submit)

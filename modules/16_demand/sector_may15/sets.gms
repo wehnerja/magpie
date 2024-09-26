@@ -1,4 +1,4 @@
-*** |  (C) 2008-2019 Potsdam Institute for Climate Impact Research (PIK)
+*** |  (C) 2008-2024 Potsdam Institute for Climate Impact Research (PIK)
 *** |  authors, and contributors see CITATION.cff file. This file is part
 *** |  of MAgPIE and licensed under AGPL-3.0-or-later. Under Section 7 of
 *** |  AGPL-3.0, you are granted additional permissions described in the
@@ -13,12 +13,6 @@ sets
    kres(kall) Residues
    / res_cereals, res_fibrous, res_nonfibrous /
 
-   k(kall) Primary products
-       / tece, maiz, trce, rice_pro, soybean, rapeseed, groundnut, sunflower,
-         oilpalm, puls_pro, potato, cassav_sp, sugr_cane, sugr_beet, others,
-         foddr, pasture, cottn_pro, begr, betr, livst_rum, livst_pig,
-         livst_chick, livst_egg, livst_milk, fish /
-
    kap(k) Animal products
    /
    livst_rum,livst_pig,livst_chick, livst_egg, livst_milk, fish
@@ -27,15 +21,13 @@ sets
    kli(kap) Livestock products
    / livst_rum, livst_pig, livst_chick, livst_egg, livst_milk  /
 
-   kve(k) Land-use activities
-       / tece, maiz, trce, rice_pro, soybean, rapeseed, groundnut, sunflower,
-         oilpalm, puls_pro, potato, cassav_sp, sugr_cane, sugr_beet, others,
-         foddr, pasture, cottn_pro, begr, betr /
+   kli_rd(kap) Ruminant meat and dairy products
+   / livst_rum,livst_milk /
 
-   kcr(kve) Cropping activities
-       / tece, maiz, trce, rice_pro, soybean, rapeseed, groundnut, sunflower,
-         oilpalm, puls_pro, potato, cassav_sp, sugr_cane, sugr_beet, others,
-         foddr, cottn_pro, begr, betr /
+   kforestry(k) forestry products
+        / wood, woodfuel /
+
  ;
 
 alias(kap,kap4);
+alias(kforestry,kforestry2);

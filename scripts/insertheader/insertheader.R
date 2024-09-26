@@ -1,4 +1,4 @@
-# |  (C) 2008-2019 Potsdam Institute for Climate Impact Research (PIK)
+# |  (C) 2008-2024 Potsdam Institute for Climate Impact Research (PIK)
 # |  authors, and contributors see CITATION.cff file. This file is part
 # |  of MAgPIE and licensed under AGPL-3.0-or-later. Under Section 7 of
 # |  AGPL-3.0, you are granted additional permissions described in the
@@ -6,20 +6,19 @@
 # |  Contact: magpie@pik-potsdam.de
 
 insertheader <- function(maindir=".",
-                         header=c("(C) 2008-2019 Potsdam Institute for Climate Impact Research (PIK)",
+                         header=c("(C) 2008-2024 Potsdam Institute for Climate Impact Research (PIK)",
                                   "authors, and contributors see CITATION.cff file. This file is part",
                                   "of MAgPIE and licensed under AGPL-3.0-or-later. Under Section 7 of",
                                   "AGPL-3.0, you are granted additional permissions described in the",
                                   "MAgPIE License Exception, version 1.0 (see LICENSE file).",
                                   "Contact: magpie@pik-potsdam.de"),
                          donottouch=c("AUTHORS","README","LICENSE",".lhd",".mz",".rda",".opt",
-                                      ".spam",".xlsx",".sh","files",".md",".RData", ".jpg",
+                                      ".xlsx",".sh","files",".md",".RData", ".jpg",
                                       ".png",".cff", ".rds", ".aux", ".log", ".out", ".pdf",
                                       ".tex", ".htm", ".css", ".bib", ".ref", ".mif", ".gdx",
-                                      ".lst", ".git-id", ".csv", ".Rdata"),
+                                      ".lst", ".git-id", ".csv", ".Rdata", ".txt"),
                          comments=c(".R"="#",".gms"="***",".cfg"="#",".csv"="*",".cs2"="*",
                                     ".cs3"="*",".cs4"="*",".sh"="#",".txt"="#"),
-                         line_endings="notwin",
                          key = "| ",
                          oldkey = NULL,
                          test_only=FALSE) {
@@ -34,9 +33,7 @@ insertheader <- function(maindir=".",
     return(gsub(".*(\\..*)","\\1",basename(file)))
   }
 
-  cwd <- getwd()
-  on.exit(setwd(cwd))
-  setwd(maindir)
+  withr::local_dir(maindir)
 
   if(is.null(oldkey)) oldkey <- key
 
@@ -88,13 +85,7 @@ insertheader <- function(maindir=".",
     done <- c(done,file)
 
     # Write file only if it was modified
-    if (writefile & !test_only) {
-      if (line_endings == "win") {
-        lucode:::writeLinesDOS(f,file)
-      } else {
-        writeLines(f,file)
-      }
-    }
+    if (writefile & !test_only) writeLines(f,file)
   }
 
   cat("Files ommitted:\n")
